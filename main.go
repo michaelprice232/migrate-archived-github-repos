@@ -17,7 +17,7 @@ type config struct {
 	targetGithubOrg string
 }
 
-type results struct {
+type result struct {
 	originalRepoURL string
 }
 
@@ -110,8 +110,8 @@ func listArchivedRepos(ctx context.Context, c *config) ([]*github.Repository, er
 }
 
 // transferRepos transfers all the repos from the source to target organisation.
-func transferRepos(ctx context.Context, c *config, repos []*github.Repository) ([]results, error) {
-	r := make([]results, 0, len(repos))
+func transferRepos(ctx context.Context, c *config, repos []*github.Repository) ([]result, error) {
+	r := make([]result, 0, len(repos))
 
 	for _, repo := range repos {
 		repoName := *repo.Name
@@ -126,14 +126,14 @@ func transferRepos(ctx context.Context, c *config, repos []*github.Repository) (
 		}
 
 		log.Printf("Migrated repo %s from org %s to org %s", repoName, c.sourceGithubOrg, c.targetGithubOrg)
-		r = append(r, results{originalRepoURL: *repo.HTMLURL})
+		r = append(r, result{originalRepoURL: *repo.HTMLURL})
 	}
 
 	return r, nil
 }
 
 // writeResultsToFile writes repos which have been migrated as results to a text file.
-func writeResultsToFile(path string, results []results) error {
+func writeResultsToFile(path string, results []result) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("error: creating file %s failed: %v", path, err)
